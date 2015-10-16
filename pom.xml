@@ -14,12 +14,9 @@
   <artifactId>brooklyn-tosca</artifactId>
   <packaging>jar</packaging>
 
-  <name>Sample Brooklyn Project org.apache.brooklyn.tosca:brooklyn-tosca v0.8.0-SNAPSHOT</name>
-  <description>
-    Sample optional description goes here.
-  </description>
+  <name>TOSCA support for Brooklyn plans leveraging Alien4Cloud</name>
 
-  <!-- Optional metadata (commented out in this sample) 
+<!-- Optional metadata (commented out in this sample) 
 
   <url>https://github.com/sample/sample</url>
 
@@ -47,7 +44,7 @@
 
   <properties>
     <project.entry>org.apache.brooklyn.tosca.a4c.brooklyn.BrooklynToscaMain</project.entry>
-    <alien.version>1.1.0-SM4-SNAPSHOT</alien.version>
+    <alien.version>1.1.0-SM5-SNAPSHOT</alien.version>
     <!-- <jetty-runner.version>8.1.17.v20150415</jetty.version> -->
     <jetty-runner.version>8.1.16.v20140903</jetty-runner.version>
   </properties>
@@ -60,6 +57,14 @@
       <releases>
         <enabled>false</enabled>
       </releases>
+    </repository>
+    <repository>
+      <id>repo.opensource.fastconnect.org</id>
+      <url>http://fastconnect.org/maven/content/repositories/opensource</url>
+    </repository>
+    <repository>
+      <id>repo.opensource.snapshot.fastconnect.org</id>
+      <url>http://fastconnect.org/maven/content/repositories/opensource-snapshot</url>
     </repository>
   </repositories>
 
