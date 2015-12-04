@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<included>
+
+    <!-- logfile named after this project -->
+    <property name="logging.basename" scope="context" value="brooklyn-tosca" />
+
+    <!-- include everything in this project at debug level -->
+    <logger name="org.apache.brooklyn.tosca" level="DEBUG"/>
+
+    <!-- include the alien appender -->
+    <include resource="brooklyn/logback-appender-alien.xml"/>
+
+    <!-- log a4c at INFO and its dependencies to a separate file at WARN - they're noisy! -->
+    <logger name="alien4cloud" additivity="false" level="INFO">
+        <appender-ref ref="ALIEN-FILE" />
+    </logger>
+    <logger name="org.springframework" additivity="false" level="WARN">
+        <appender-ref ref="ALIEN-FILE" />
+    </logger>
+    <logger name="org.elasticsearch" additivity="false" level="WARN">
+        <appender-ref ref="ALIEN-FILE" />
+    </logger>
+    <logger name="org.hibernate" additivity="false" level="WARN">
+        <appender-ref ref="ALIEN-FILE" />
+    </logger>
+
+</included>

@@ -31,3 +31,7 @@ brooklyn*.log.*
 
 ignored
 runtime
+
+*.pyc
+*.out
+
