@@ -1,5 +1,14 @@
 package io.cloudsoft.tosca.a4c.brooklyn;
 
+import alien4cloud.component.repository.exception.CSARVersionAlreadyExistsException;
+import alien4cloud.tosca.parser.ParsingException;
+import alien4cloud.utils.FileUtil;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Iterators;
+import com.google.common.io.Files;
+import io.cloudsoft.tosca.a4c.Alien4CloudIntegrationTest;
+import io.cloudsoft.tosca.a4c.brooklyn.util.EntitySpecs;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotNull;
@@ -49,11 +58,19 @@ import alien4cloud.tosca.parser.ParsingException;
 import alien4cloud.utils.FileUtil;
 import io.cloudsoft.tosca.a4c.Alien4CloudIntegrationTest;
 import io.cloudsoft.tosca.a4c.brooklyn.util.EntitySpecs;
+import javax.annotation.Nullable;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
-import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Iterators;
-import com.google.common.io.Files;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
 
 public class ToscaTypePlanTransformerIntegrationTest extends Alien4CloudIntegrationTest {
 
@@ -190,6 +207,51 @@ public class ToscaTypePlanTransformerIntegrationTest extends Alien4CloudIntegrat
                 "echo This is the target");
     }
 
+
+    @Test
+    public void testRelationNotOverridePropCollectionConfigKey()
+            throws ParsingException, CSARVersionAlreadyExistsException, IOException {
+
+        Path outputPath = makeOutputPath("relationship-defined-prop-collection.yaml", "relation", "test.sh", "target.sh");
+        ToscaApplication toscaApplication = platform.parse(outputPath);
+        EntitySpec<? extends Application> app = transformer.createApplicationSpec(toscaApplication);
+
+        assertNotNull(app);
+        assertEquals(app.getChildren().size(), 2);
+
+        EntitySpec<?> tomcatServer = EntitySpecs
+                .findChildEntitySpecByPlanId(app, "tomcat_server");
+
+        assertNotNull(tomcatServer.getConfig().get(TomcatServer.JAVA_SYSPROPS));
+        assertEquals(((Map) tomcatServer.getConfig().get(TomcatServer.JAVA_SYSPROPS)).size(), 2);
+        assertEquals(((Map) tomcatServer.getConfig().get(TomcatServer.JAVA_SYSPROPS))
+                .get("brooklyn.example.db.url").toString(), DATABASE_DEPENDENCY_INJECTION);
+        assertEquals(((Map) tomcatServer.getConfig().get(TomcatServer.JAVA_SYSPROPS))
+                .get("key1").toString(), "value1");
+    }
+
+    @Test
+    public void testRelationNotOverridePropCollectionFlag()
+            throws ParsingException, CSARVersionAlreadyExistsException, IOException {
+
+        Path outputPath = makeOutputPath("relationship-defined-prop-collection-flag.yaml", "relation", "test.sh", "target.sh");
+        ToscaApplication toscaApplication = platform.parse(outputPath);
+        EntitySpec<? extends Application> app = transformer.createApplicationSpec(toscaApplication);
+
+        assertNotNull(app);
+        assertEquals(app.getChildren().size(), 2);
+
+        EntitySpec<?> tomcatServer = EntitySpecs
+                .findChildEntitySpecByPlanId(app, "tomcat_server");
+
+        assertNotNull(tomcatServer.getFlags().get("javaSysProps"));
+        assertEquals(((Map) tomcatServer.getFlags().get("javaSysProps")).size(), 2);
+        assertEquals(((Map) tomcatServer.getFlags().get("javaSysProps"))
+                .get("brooklyn.example.db.url").toString(), DATABASE_DEPENDENCY_INJECTION);
+        assertEquals(((Map) tomcatServer.getFlags().get("javaSysProps"))
+                .get("key1").toString(), "value1");
+    }
+
     private Path makeOutputPath(String yamlFile, String scriptsFolder, String... scripts) throws IOException {
         File tempDir = Files.createTempDir();
         tempDir.deleteOnExit();
@@ -219,7 +281,7 @@ public class ToscaTypePlanTransformerIntegrationTest extends Alien4CloudIntegrat
 
         assertNotNull(tomcatServer.getConfig().get(TomcatServer.JAVA_SYSPROPS));
         assertEquals(((Map) tomcatServer.getConfig().get(TomcatServer.JAVA_SYSPROPS)).size(), 2);
-        assertEquals(((Map)tomcatServer.getConfig().get(TomcatServer.JAVA_SYSPROPS))
+        assertEquals(((Map) tomcatServer.getConfig().get(TomcatServer.JAVA_SYSPROPS))
                 .get("dbConnection1").toString(), "connection1");
         assertEquals(((Map) tomcatServer.getConfig().get(TomcatServer.JAVA_SYSPROPS))
                 .get("dbConnection2").toString(), "connection2");
